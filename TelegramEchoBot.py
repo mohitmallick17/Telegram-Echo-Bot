@@ -2,13 +2,7 @@ import logging
 from dotenv import load_dotenv
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import os
-####
-# Author MohitMallick17@github
-# Disclaimer :
-# I am not responsible if your bot is u
-#
-#
-####
+
 load_dotenv('config.env')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 updater = Updater(token=os.getenv('BOT_TOKEN'), use_context=True)
@@ -21,30 +15,23 @@ def start(update, context):
 
 def echo(update, context):
     msg = update.message
+    auth_chat = os.getenv('AUTHORIZED_CHATS')[1:-1].split(',')
     if msg.video and msg.video != {}:
-        context.bot.send_video(chat_id=update.effective_chat.id, video=update.message.video, caption=msg.caption)
-    if msg.sticker and msg.sticker != {}:
-        context.bot.send_sticker(chat_id=update.effective_chat.id, sticker=update.message.sticker)
+        for chat in auth_chat:
+            context.bot.send_video(chat_id=chat, video=update.message.video, caption=msg.caption)
     elif msg.document and msg.document != {}:
-        context.bot.send_document(chat_id=update.effective_chat.id, document=update.message.document, caption=msg.caption)
+        for chat in auth_chat:
+            context.bot.send_document(chat_id=chat, document=update.message.document, caption=msg.caption)
     elif msg.text:
-        context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
-    elif msg.game:
-        context.bot.send_game(chat_id=update.effective_chat.id, game=update.message.game)
-    elif msg.audio:
-        context.bot.send_audio(chat_id=update.effective_chat.id, audio=update.message.audio)
-    elif msg.voice:
-        context.bot.send_voice(chat_id=update.effective_chat.id, voice=update.message.voice)
+        for chat in auth_chat:
+            if 'mega' in chat or 't.me' in chat:
+                context.bot.send_message(chat_id=chat, text=update.message.text)
     elif msg.video_note:
-        context.bot.send_video_note(chat_id=update.effective_chat.id, video_note=update.message.video_note)
-    elif msg.contact:
-        context.bot.send_contact(chat_id=update.effective_chat.id, contact=update.message.contact, caption=msg.caption)
-    elif msg.location:
-        context.bot.send_location(chat_id=update.effective_chat.id, location=update.message.location, caption=msg.caption)
-    elif msg.venue:
-        context.bot.send_venue(chat_id=update.effective_chat.id, venue=update.message.venue, caption=msg['caption'])
+        for chat in auth_chat:
+            context.bot.send_video_note(chat_id=chat, video_note=update.message.video_note)
     elif msg.photo and msg.photo != []:
-        context.bot.send_photo(chat_id=update.effective_chat.id, photo=msg.photo[0]['file_id'])
+        for chat in auth_chat:
+            context.bot.send_photo(chat_id=chat, photo=msg.photo[0]['file_id'])
 
 
 cmd = CommandHandler('start', start)
