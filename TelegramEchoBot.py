@@ -111,7 +111,6 @@ def start(update, context):
 
 
 def echo(update, context):
-    print(auth_chats)
     if 'ALL' in auth_chats or str(update.effective_chat.id) in auth_chats:
         msg = update.message
         if msg.video and msg.video != {}:
